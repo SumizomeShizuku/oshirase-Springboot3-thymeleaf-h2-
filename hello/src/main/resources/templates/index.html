@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>お知らせ検索</title>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      table,
+      th,
+      td {
+        border: 1px solid black;
+      }
+      th,
+      td {
+        padding: 8px;
+        text-align: left;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>お知らせ検索</h1>
+    <form th:action="@{/search}" method="post">
+      <label for="title">お知らせタイトル:</label>
+      <input type="text" id="title" name="title" /><br />
+
+      <label for="category">お知らせ区分:</label>
+      <select id="category" name="category">
+        <option value="">すべて</option>
+        <option value="1">重要</option>
+        <option value="2">情報</option>
+        <!-- 其他选项 --></select
+      ><br />
+
+      <label for="postDate">掲載日:</label>
+      <input
+        type="text"
+        id="postDate"
+        name="postDate"
+        placeholder="YYYYMMDD"
+      /><br />
+
+      <label for="startDate">適用期間:</label>
+      <input
+        type="text"
+        id="startDate"
+        name="startDate"
+        placeholder="YYYYMMDD"
+      />
+      ~
+      <input
+        type="text"
+        id="endDate"
+        name="endDate"
+        placeholder="YYYYMMDD"
+      /><br />
+
+      <button type="submit">検索</button>
+    </form>
+
+    <h2>検索結果</h2>
+    <table>
+      <thead>
+        <tr>
+          <!-- <th>お知らせID</th> -->
+          <th>お知らせタイトル</th>
+          <th>お知らせ区分</th>
+          <th>掲載日</th>
+          <th>適用開始年月日</th>
+          <th>適用終了年月日</th>
+          <th>お知らせ内容</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="notice : ${notices}">
+          <!-- <td th:text="${notice.noticeId}"></td> -->
+          <td th:text="${notice.title}"></td>
+          <td th:text="${notice.category}"></td>
+          <td th:text="${notice.postDate}"></td>
+          <td th:text="${notice.startDate}"></td>
+          <td th:text="${notice.endDate}"></td>
+          <td th:text="${notice.content}"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div th:if="${totalPages > 1}">
+      <span>ページ:</span>
+      <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+        <a th:href="@{/search(page=${i})}" th:text="${i}"></a>
+      </span>
+    </div>
+  </body>
+</html>

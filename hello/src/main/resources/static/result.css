@@ -1,0 +1,122 @@
+h1 {
+  font-size: 18pt;
+  font-weight: bold;
+}
+
+body {
+  /* font-family: Arial, sans-serif; */
+  /* margin: 20px; */
+  font-size: 13;
+  margin: 5px 25px;
+}
+
+div {
+  margin-bottom: 20px;
+}
+
+thead,
+tfoot {
+  background-color: rgb(228 240 245);
+}
+
+label {
+  display: inline-block;
+  width: 150px;
+  margin-bottom: 10px;
+}
+label[type="mid"] {
+  display: inline-block;
+  width: 130px;
+  margin-left: 20px;
+  margin-bottom: 10px;
+}
+input[type="text"],
+input[type="date"],
+select {
+  width: 200px;
+  padding: 5px;
+}
+button {
+  font-size: 17px;
+  width: 120px;
+  margin-left: 120px;
+}
+
+.sub_button {
+  font-size: 17px;
+  width: 120px;
+  margin-top: 50px;
+  margin-left: 20px;
+}
+
+.search-container {
+  margin-bottom: 20px;
+}
+.date-range {
+  display: inline-block;
+  width: 90px;
+}
+.date-range-separator {
+  display: inline-block;
+  padding: 0 10px;
+}
+table {
+  /* width: 100%; */
+  width: 1237px;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+/* table {
+  border-collapse: collapse;
+  border: 2px solid rgb(140 140 140);
+  font-family: sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+} */
+
+th,
+td {
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+pre {
+  border: solid 3px #ddd;
+  padding: 10px;
+}
+
+caption {
+  caption-side: bottom;
+  padding: 10px;
+  font-weight: bold;
+}
+
+.th_left {
+  border: 1px solid rgb(160 160 160);
+  text-align: left;
+}
+.th_center {
+  border: 1px solid rgb(160 160 160);
+  text-align: center;
+}
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+}
+.pagination a {
+  margin: 0 5px;
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  text-decoration: none;
+  color: #333;
+}
+.pagination a.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>お知らせ</title>
+    <link rel="stylesheet" href="../static/result.css" />
+  </head>
+  <body>
+    <h1>お知らせ</h1>
+
+    <!-- 标题标签和文本框 -->
+    <!-- <div>
+      <label for="title">お知らせタイトル</label>
+      <input type="text" id="title" name="title" /> -->
+
+    <!-- 区分标签和下拉选单 -->
+    <!-- <label type="mid" for="category">お知らせ区分</label>
+      <select id="category" name="category">
+        <option value="option1">选项1</option>
+        <option value="option2">选项2</option>
+        <option value="option3">选项3</option>
+      </select>
+    </div>
+    <div>
+      <label for="publishDate">掲載日</label>
+      <input type="date" id="publishDate" name="publishDate" />
+
+      <label type="mid" for="startDate">適用期間</label>
+      <input type="date" id="startDate" name="startDate" class="date-range" />
+      <span class="date-range-separator">~</span>
+      <input type="date" id="endDate" name="endDate" class="date-range" />
+      <button type="submit">検 索</button>
+    </div> -->
+    <form action="/oshirase" method="get">
+      <label for="title">タイトル:</label>
+      <input
+        type="text"
+        id="title"
+        name="title"
+        placeholder="Enter title"
+        th:value="${title}"
+      />
+
+      <label for="category">タイトル区分:</label>
+      <select id="category" name="category">
+        <option value="">--Select an category--</option>
+        <!-- 默认空选项 -->
+        <option
+          th:each="kubunItem : ${allCategory}"
+          th:value="${kubunItem.kubun}"
+          th:text="${kubunItem.displayName}"
+          th:selected="${kubunItem.kubun == category}"
+        ></option>
+      </select>
+
+      <br />
+      <label for="registrationDate">掲載日:</label>
+      <input
+        type="date"
+        id="registrationDate"
+        name="registrationDate"
+        th:value="${registrationDate}"
+      />
+
+      <label for="startDate">適用期間:</label>
+      <input
+        type="date"
+        id="startDate"
+        name="startDate"
+        th:value="${startDate}"
+      />
+      <label for="endDate">~</label>
+      <input type="date" id="endDate" name="endDate" th:value="${endDate}" />
+
+      <button type="submit">Search</button>
+    </form>
+
+    <table border="1">
+      <thead>
+        <tr>
+          <th colspan="4">
+            <a>検索結果</a>
+          </th>
+          <th>
+            <a
+              th:if="${currentPage > 0}"
+              th:href="@{/oshirase(page=0, title=${title}, category=${category}, registrationDate=${registrationDate}, startDate=${startDate}, endDate=${endDate})}"
+              style="font-size: 20px; text-decoration: none"
+            >
+              |&NestedLessLess;
+            </a>
+            <a
+              th:if="${currentPage > 0}"
+              th:href="@{/oshirase(page=${currentPage - 1}, title=${title}, category=${category}, registrationDate=${registrationDate}, startDate=${startDate}, endDate=${endDate})}"
+              style="font-size: 20px; text-decoration: none"
+            >
+              &lt;
+            </a>
+            <span
+              th:text="'Page ' + (${currentPage} + 1) + ' / ' + ${totalPages}"
+            ></span>
+            <a
+              th:if="${currentPage < totalPages - 1}"
+              th:href="@{/oshirase(page=${currentPage + 1}, title=${title}, category=${category}, registrationDate=${registrationDate}, startDate=${startDate}, endDate=${endDate})}"
+              style="font-size: 20px; text-decoration: none"
+            >
+              &gt;
+            </a>
+            <a
+              th:if="${currentPage < totalPages - 1}"
+              th:href="@{/oshirase(page=${totalPages - 1}, title=${title}, category=${category}, registrationDate=${registrationDate}, startDate=${startDate}, endDate=${endDate})}"
+              style="font-size: 20px; text-decoration: none"
+            >
+              &NestedGreaterGreater;|
+            </a>
+
+            <span th:text="${totalItems} + '件'"></span>
+          </th>
+        </tr>
+        <tr>
+          <th></th>
+          <th>お知らせタイトル</th>
+          <th>お知らせ区分</th>
+          <th>掲載日</th>
+          <th>適用期間</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          th:each="user : ${oshirase}"
+          th:attr="onclick='handleRowClick(this, event)'"
+          style="cursor: pointer"
+        >
+          <td><input type="radio" name="selectedUser" value="${user.id}" /></td>
+          <td th:text="${user.title}"></td>
+          <td th:text="${user.getDisplayName}"></td>
+
+          <td th:text="${user.regDayforTable}"></td>
+
+          <td
+            th:text="${user.startDayforTable + ' ~ ' + user.endDayforTable}"
+          ></td>
+        </tr>
+        <tr th:if="${oshirase.size() == 0}">
+          <td colspan="6">No users found</td>
+        </tr>
+      </tbody>
+
+      <script>
+        function handleRowClick(row, event) {
+          if (event.target.type === "radio") {
+            return;
+          }
+          // 获取当前行中的 radio 元素
+          var radio = row.querySelector('input[type="radio"]');
+
+          // 设置该 radio 为选中状态
+          radio.checked = true;
+        }
+      </script>
+    </table>
+  </body>
+</html>
