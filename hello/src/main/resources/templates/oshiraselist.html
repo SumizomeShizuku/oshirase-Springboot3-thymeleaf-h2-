@@ -46,11 +46,10 @@
       />
       <label for="endDate">~</label>
       <input type="date" id="endDate" name="endDate" th:value="${endDate}" />
-      <input type="hidden" name="search" value="true" />
       <button type="submit">Search</button>
     </form>
 
-    <table border="1" th:if="${searchCheck}">
+    <table border="1">
       <thead>
         <tr>
           <th colspan="4">
