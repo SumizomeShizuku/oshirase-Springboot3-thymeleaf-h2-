@@ -1,6 +1,7 @@
 h1 {
   font-size: 18pt;
   font-weight: bold;
+  margin: 0px;
 }
 
 body {
@@ -62,9 +63,9 @@ button {
 }
 table {
   /* width: 100%; */
-  width: 1237px;
+  width: 80vw;
   border-collapse: collapse;
-  margin-top: 20px;
+  margin-top: 0px;
 }
 
 /* table {
@@ -77,11 +78,12 @@ table {
 
 th,
 td {
-  padding: 10px;
+  padding: 5px;
   text-align: left;
 }
 
 th {
+  height: 20px;
   background-color: #f2f2f2;
 }
 

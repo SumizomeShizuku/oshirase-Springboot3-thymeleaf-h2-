@@ -1,5 +1,9 @@
 package com.anestec.hello.model;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -34,8 +38,25 @@ public class Announcement {
     @Column(name = "ENABLE_END_YMD")
     private String endDate;
 
+    @Column(name = "INFORMATION_NAIYO")
+    private String infomessage;
+
     @Column(name = "DELETE_FLG")
     private String deleteFlg;
+
+    @Column(name = "CREATE_USER_CD")
+    private String createUser;
+
+    @CreationTimestamp
+    @Column(name = "CREATE_TIME", updatable = false)
+    private LocalDateTime createTime;
+
+    @Column(name = "UPDATE_USER_CD")
+    private String updateUser;
+
+    @CreationTimestamp
+    @Column(name = "UPDATE_TIME")
+    private LocalDateTime updateTime;
 
     @ManyToOne
     @JoinColumn(name = "INFORMATION_KBN", referencedColumnName = "kubun", insertable = false, updatable = false)
@@ -95,8 +116,16 @@ public class Announcement {
         return endDate;
     }
 
-    public void setEndtDate(String endDate) {
+    public void setEndDate(String endDate) {
         this.endDate = endDate;
+    }
+
+    public String getInfomessage() {
+        return infomessage;
+    }
+
+    public void setInfomessage(String infomessage) {
+        this.infomessage = infomessage;
     }
 
     public String getDeleteFlg() {
@@ -105,6 +134,38 @@ public class Announcement {
 
     public void setDeleteFlg(String deleteFlg) {
         this.deleteFlg = deleteFlg;
+    }
+
+    public String getCreateUser() {
+        return createUser;
+    }
+
+    public void setCreateUser(String createUser) {
+        this.createUser = createUser;
+    }
+
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getUpdateUser() {
+        return updateUser;
+    }
+
+    public void setUpdateUser(String updateUser) {
+        this.updateUser = updateUser;
+    }
+
+    public LocalDateTime getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(LocalDateTime updateTime) {
+        this.updateTime = updateTime;
     }
 
     // 通过 kubun 实体获取 displayName

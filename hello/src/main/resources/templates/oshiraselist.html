@@ -2,7 +2,32 @@
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
     <title>お知らせ</title>
-    <link rel="stylesheet" href="../static/result.css" />
+    <link rel="stylesheet" href="result.css" />
+    <style>
+      /* 背景を暗くするオーバーレイ */
+      #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+      }
+
+      /* 中央に表示されるダイアログ */
+      #registerDialog {
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        width: 50vw;
+        max-width: 600px;
+        height: 40vw;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      }
+    </style>
   </head>
   <body>
     <h1>お知らせ</h1>
@@ -133,5 +158,69 @@
         }
       </script>
     </table>
+
+    <button type="button" id="openDialogButton">データ登録</button>
+    <!-- ダイアログ -->
+    <div id="overlay">
+      <div id="registerDialog">
+        <h3>データ登録フォーム</h3>
+        <form th:action="@{/oshirase}" method="post">
+          <label for="dialogTitle">タイトル</label>
+          <input
+            type="text"
+            id="dialogTitle"
+            name="dialogTitle"
+            required
+          /><br /><br />
+
+          <label for="dialogCategory">タイトル区分:</label>
+          <select id="dialogCategory" name="dialogCategory" required>
+            <option value="">--Select an category--</option>
+            <!-- 默认空选项 -->
+            <option
+              th:each="dialogKubunItem : ${allCategory}"
+              th:value="${dialogKubunItem.kubun}"
+              th:text="${dialogKubunItem.displayName}"
+            ></option>
+          </select>
+          <br /><br />
+
+          <label for="dialogRegistrationDate">掲載日:</label>
+          <input
+            type="date"
+            id="dialogRegistrationDate"
+            name="dialogRegistrationDate"
+            required
+          />
+
+          <label for="dialogStartDate">適用期間:</label>
+          <input
+            type="date"
+            id="dialogStartDate"
+            name="dialogStartDate"
+            required
+          />
+          <label for="dialogEndDate">~</label>
+          <input type="date" id="dialogEndDate" name="dialogEndDate" required />
+          <br /><br />
+          <button type="submit">登録</button>
+          <button type="button" id="closeDialogButton">閉じる</button>
+        </form>
+      </div>
+    </div>
+    <script>
+      // ダイアログの表示と非表示を制御するスクリプト
+      document
+        .getElementById("openDialogButton")
+        .addEventListener("click", function () {
+          document.getElementById("overlay").style.display = "flex";
+        });
+
+      document
+        .getElementById("closeDialogButton")
+        .addEventListener("click", function () {
+          document.getElementById("overlay").style.display = "none";
+        });
+    </script>
   </body>
 </html>

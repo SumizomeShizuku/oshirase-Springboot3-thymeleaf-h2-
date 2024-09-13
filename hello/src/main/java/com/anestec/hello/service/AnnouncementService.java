@@ -54,4 +54,22 @@ public class AnnouncementService {
         return categoryRepository.findAll();
     }
 
+    public void saveAnnouncement(String title, String category, String registrationDate, String startDate, String endDate,
+            String infomessage, String deleteFlg, String createUser, String updateUser) {
+
+        // 将数据保存到数据库
+        Announcement announcement = new Announcement();
+        announcement.setTitle(title);
+        announcement.setCategory(category);
+        announcement.setRegistrationDate(registrationDate);
+        announcement.setStartDate(startDate);
+        announcement.setEndDate(endDate);
+        announcement.setInfomessage(infomessage);
+        announcement.setDeleteFlg(deleteFlg);
+        announcement.setCreateUser(createUser);
+        announcement.setUpdateUser(updateUser);
+
+        announcementRepository.save(announcement);  // 保存到数据库
+    }
+
 }

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.anestec.hello.model.Announcement;
@@ -103,6 +104,40 @@ public class AnnouncementController {
 
         model.addAttribute("allCategory", kubunList); // 下拉菜单的数据
         return "oshiraselist"; // Thymeleaf 模板名称
+    }
+
+    @PostMapping("/oshirase")
+    public String registerAnnouncement(
+            @RequestParam("dialogTitle") String title,
+            @RequestParam("dialogCategory") String dialogCategory,
+            @RequestParam("dialogRegistrationDate") String dialogRegistrationDate,
+            @RequestParam("dialogStartDate") String dialogStartDate,
+            @RequestParam("dialogEndDate") String dialogEndDate,
+            Model model) {
+
+        DateTimeFormatter inputDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter outputDateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+        String regDate = LocalDate.parse(dialogRegistrationDate, inputDateFormatter).format(outputDateFormatter);
+        String sDate = LocalDate.parse(dialogStartDate, inputDateFormatter).format(outputDateFormatter);
+        String eDate = LocalDate.parse(dialogEndDate, inputDateFormatter).format(outputDateFormatter);
+
+        //test data
+        String infomessage = "Test Info";
+        String deleteFlg = "0";
+        String createUser = "admin";
+        String updateUser = "admin2";
+
+        // 在这里你可以调用服务层将数据保存到数据库
+        announcementService.saveAnnouncement(title, dialogCategory, regDate, sDate, eDate,
+                infomessage, deleteFlg, createUser, updateUser);
+        System.out.println("Title: " + "  " + title);
+        System.out.println("Category: " + "  " + dialogCategory);
+        System.out.println("RegistrationDate: " + "  " + regDate);
+        System.out.println("StartDate: " + "  " + sDate);
+        System.out.println("EndDate: " + "  " + eDate);
+        // 重定向或返回一个成功页面
+        return "redirect:/oshirase";  // 重新加载列表页
     }
 
     // @GetMapping("/")
