@@ -37,49 +37,67 @@ public class AnnouncementController {
             @RequestParam(value = "startDate", required = false) String startDate,
             @RequestParam(value = "endDate", required = false) String endDate,
             @RequestParam(value = "page", defaultValue = "0") int page, // 页码参数，默认第 0 页
-            @RequestParam(value = "size", defaultValue = "10") int size) { // 每页条数，默认 10 条
+            @RequestParam(value = "size", defaultValue = "10") int size,// 每页条数，默认 10 条
+            @RequestParam(value = "search", required = false) String search) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Announcement> oshiraselist;
+        Page<Announcement> oshiraselist = Page.empty();
+        boolean searchCheck = (search == null || search.isEmpty());
 
-        DateTimeFormatter inputDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        DateTimeFormatter outputDateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        if (!searchCheck) {
 
-        String regDate = null;
-        if (registrationDate != null && !registrationDate.isEmpty()) {
-            LocalDate parsedDate = LocalDate.parse(registrationDate, inputDateFormatter);
-            regDate = parsedDate.format(outputDateFormatter);
-        }
-        String sDate = null;
-        if (startDate != null && !startDate.isEmpty()) {
-            LocalDate parsedDate = LocalDate.parse(startDate, inputDateFormatter);
-            sDate = parsedDate.format(outputDateFormatter);
-        }
-        String eDate = null;
-        if (endDate != null && !endDate.isEmpty()) {
-            LocalDate parsedDate = LocalDate.parse(endDate, inputDateFormatter);
-            eDate = parsedDate.format(outputDateFormatter);
-        }
-        // LocalDateTime regDate = (registrationDate != null && !registrationDate.isEmpty()) ? LocalDate.parse(registrationDate, formatter).atTime(LocalTime.now()) : null;
-        // LocalDateTime sDate = (startDate != null && !startDate.isEmpty()) ? LocalDate.parse(startDate, formatter).atTime(LocalTime.now()) : null;
-        // LocalDateTime eDate = (endDate != null && !endDate.isEmpty()) ? LocalDate.parse(endDate, formatter).atTime(LocalTime.now()) : null;
-        // String regDate = (registrationDate != null && !registrationDate.isEmpty()) ? registrationDate : null;
-        // String sDate = (startDate != null && !startDate.isEmpty()) ? startDate : null;
-        // String eDate = (endDate != null && !endDate.isEmpty()) ? endDate : null;
+            DateTimeFormatter inputDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DateTimeFormatter outputDateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-        if ((title == null || title.isBlank()) && (category == null || category.isBlank())
-                && regDate == null && sDate == null && eDate == null) {
-            oshiraselist = announcementService.getAllOshirase(pageable);
-        } else {
-            oshiraselist = announcementService.searchAnnouncement(title, category, regDate, sDate, eDate, pageable);
+            String regDate = null;
+            if (registrationDate != null && !registrationDate.isEmpty()) {
+                LocalDate parsedDate = LocalDate.parse(registrationDate, inputDateFormatter);
+                regDate = parsedDate.format(outputDateFormatter);
+            }
+            String sDate = null;
+            if (startDate != null && !startDate.isEmpty()) {
+                LocalDate parsedDate = LocalDate.parse(startDate, inputDateFormatter);
+                sDate = parsedDate.format(outputDateFormatter);
+            }
+            String eDate = null;
+            if (endDate != null && !endDate.isEmpty()) {
+                LocalDate parsedDate = LocalDate.parse(endDate, inputDateFormatter);
+                eDate = parsedDate.format(outputDateFormatter);
+            }
+            // LocalDateTime regDate = (registrationDate != null && !registrationDate.isEmpty()) ? LocalDate.parse(registrationDate, formatter).atTime(LocalTime.now()) : null;
+            // LocalDateTime sDate = (startDate != null && !startDate.isEmpty()) ? LocalDate.parse(startDate, formatter).atTime(LocalTime.now()) : null;
+            // LocalDateTime eDate = (endDate != null && !endDate.isEmpty()) ? LocalDate.parse(endDate, formatter).atTime(LocalTime.now()) : null;
+            // String regDate = (registrationDate != null && !registrationDate.isEmpty()) ? registrationDate : null;
+            // String sDate = (startDate != null && !startDate.isEmpty()) ? startDate : null;
+            // String eDate = (endDate != null && !endDate.isEmpty()) ? endDate : null;
+
+            if ((title == null || title.isBlank()) && (category == null || category.isBlank())
+                    && regDate == null && sDate == null && eDate == null) {
+                searchCheck = true;
+                oshiraselist = announcementService.getAllOshirase(pageable);
+            } else {
+                searchCheck = true;
+                oshiraselist = announcementService.searchAnnouncement(title, category, regDate, sDate, eDate, pageable);
+            }
+
+            // 将 yyyyMMdd 格式的日期转换为 yyyy-MM-dd 格式
+            String regDay = formatBackendDate(regDate);
+            String startDay = formatBackendDate(sDate);
+            String endDay = formatBackendDate(eDate);
+
+            model.addAttribute("registrationDate", regDay);
+            model.addAttribute("startDate", startDay);
+            model.addAttribute("endDate", endDay);
+
+            System.out.println("Start Date: " + sDate + "  " + startDate);
+            System.out.println("End Date: " + eDate + "  " + endDate);
+
+            model.addAttribute("regDayforTable", regDate);
+            model.addAttribute("startDayforTable", sDate);
+            model.addAttribute("endDayforTable", eDate);
         }
 
         // List<String> allCategory = announcementService.getAllCategory();
         List<Category> kubunList = announcementService.getAllKubun();
-
-        // 将 yyyyMMdd 格式的日期转换为 yyyy-MM-dd 格式
-        String regDay = formatBackendDate(regDate);
-        String startDay = formatBackendDate(sDate);
-        String endDay = formatBackendDate(eDate);
 
         // String regDayforTable = formatFrontendDate(regDate);
         // String startDayforTable = formatFrontendDate(sDate);
@@ -96,17 +114,8 @@ public class AnnouncementController {
         // model.addAttribute("startDate", startDate);
         // model.addAttribute("endDate", endDate);
 
-        model.addAttribute("registrationDate", regDay);
-        model.addAttribute("startDate", startDay);
-        model.addAttribute("endDate", endDay);
-        System.out.println("Start Date: " + sDate + "  " + startDate);
-        System.out.println("End Date: " + eDate + "  " + endDate);
-
-        model.addAttribute("regDayforTable", regDate);
-        model.addAttribute("startDayforTable", sDate);
-        model.addAttribute("endDayforTable", eDate);
-
         model.addAttribute("allCategory", kubunList); // 下拉菜单的数据
+        model.addAttribute("searchCheck", searchCheck);
         return "oshiraselist"; // Thymeleaf 模板名称
     }
 
