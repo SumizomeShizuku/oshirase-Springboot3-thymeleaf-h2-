@@ -14,7 +14,7 @@ public class Category {
     private Long id;  // 主键
 
     @Column(nullable = false, name = "KUBUN")
-    private String kubun;  // 状态值，例如 0, 1, 5
+    private String category;  // 状态值，例如 0, 1, 5
 
     @Column(nullable = false, name = "DISPLAYNAME")
     private String displayName;  // 显示名称，例如 "无", "有", "恢复中"
@@ -29,11 +29,11 @@ public class Category {
     }
 
     public String getKubun() {
-        return kubun;
+        return category;
     }
 
     public void setKubun(String kubun) {
-        this.kubun = kubun;
+        this.category = kubun;
     }
 
     public String getDisplayName() {

@@ -45,7 +45,7 @@ public class AnnouncementService {
 
     public List<String> getAllCategory() {
         return announcementRepository.findAll().stream()
-                .map(Announcement::getCategory) // 提取 email 字段
+                .map(Announcement::getCategory) // 提取 Category 字段
                 .distinct() // 去除重复的邮箱
                 .collect(Collectors.toList());
     }
@@ -72,4 +72,43 @@ public class AnnouncementService {
         announcementRepository.save(announcement);  // 保存到数据库
     }
 
+    public void updateAnnouncement(Long id, String title, String category, String registrationDate, String startDate, String endDate) {
+
+        // 将数据保存到数据库
+        Announcement announcement = findById(id);
+        if (announcement != null) {
+
+            announcement.setTitle(title);
+            announcement.setCategory(category);
+            announcement.setRegistrationDate(registrationDate);
+            announcement.setStartDate(startDate);
+            announcement.setEndDate(endDate);
+            // announcement.setInfomessage(infomessage);
+            // announcement.setDeleteFlg(deleteFlg);
+            // announcement.setCreateUser(createUser);
+            // announcement.setUpdateUser(updateUser);
+
+            announcementRepository.save(announcement);  // 保存到数据库
+        }
+    }
+
+    public void deleteAnnouncement(Long id) {
+
+        // 将数据保存到数据库
+        Announcement announcement = findById(id);
+        if (announcement != null) {
+
+            announcement.setDeleteFlg("1");
+
+            announcementRepository.save(announcement);  // 保存到数据库
+        }
+    }
+
+    public Announcement findById(Long id) {
+        return announcementRepository.findById(id).orElse(null);
+    }
+
+    // public void updateAnnouncement(Announcement announcement) {
+    //     announcementRepository.save(announcement);  // 保存更新后的记录
+    // }
 }

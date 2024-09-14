@@ -27,6 +27,29 @@
         height: 40vw;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
       }
+
+      #overlay_upd {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+      }
+
+      /* 中央に表示されるダイアログ */
+      #updateDialog {
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        width: 50vw;
+        max-width: 600px;
+        height: 40vw;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      }
     </style>
   </head>
   <body>
@@ -122,49 +145,56 @@
           <th>お知らせ区分</th>
           <th>掲載日</th>
           <th>適用期間</th>
+          <!-- <th>id</th> -->
         </tr>
       </thead>
       <tbody>
         <tr
-          th:each="user : ${oshirase}"
+          th:each="record : ${oshirase}"
+          th:data-id="${record.id}"
+          th:data-title="${record.title}"
+          th:data-category="${record.getDisplayName}"
+          th:data-regdate="${record.regDayforTable}"
+          th:data-startdate="${record.startDayforTable}"
+          th:data-enddate="${record.endDayforTable}"
+          th:data-deleteflg="${record.deleteFlg}"
           th:attr="onclick='handleRowClick(this, event)'"
           style="cursor: pointer"
         >
-          <td><input type="radio" name="selectedUser" value="${user.id}" /></td>
-          <td th:text="${user.title}"></td>
-          <td th:text="${user.getDisplayName}"></td>
+          <td>
+            <input type="radio" name="selectedRecord" value="${record.id}" />
+          </td>
+          <td th:text="${record.title}"></td>
+          <td th:text="${record.getDisplayName}"></td>
 
-          <td th:text="${user.regDayforTable}"></td>
+          <td th:text="${record.regDayforTable}"></td>
 
           <td
-            th:text="${user.startDayforTable + ' ~ ' + user.endDayforTable}"
+            th:text="${record.startDayforTable + ' ~ ' + record.endDayforTable}"
           ></td>
+          <!-- <td th:text="${record.id}"></td> -->
         </tr>
         <tr th:if="${oshirase.size() == 0}">
           <td colspan="6">No Announcement found</td>
         </tr>
       </tbody>
-
-      <script>
-        function handleRowClick(row, event) {
-          if (event.target.type === "radio") {
-            return;
-          }
-          // 获取当前行中的 radio 元素
-          var radio = row.querySelector('input[type="radio"]');
-
-          // 设置该 radio 为选中状态
-          radio.checked = true;
-        }
-      </script>
     </table>
 
-    <button type="button" id="openDialogButton">データ登録</button>
+    <button type="button" id="openDialogButton_reg">データ登録</button>
     <!-- ダイアログ -->
     <div id="overlay">
       <div id="registerDialog">
         <h3>データ登録フォーム</h3>
-        <form th:action="@{/oshirase}" method="post">
+        <form th:action="@{/oshirase/register}" method="post">
+          <input type="hidden" name="searchTitle" th:value="${title}" />
+          <input type="hidden" name="searchCategory" th:value="${category}" />
+          <input
+            type="hidden"
+            name="searchRegistrationDate"
+            th:value="${registrationDate}"
+          />
+          <input type="hidden" name="searchStartDate" th:value="${startDate}" />
+          <input type="hidden" name="searchEndDate" th:value="${endDate}" />
           <label for="dialogTitle">タイトル</label>
           <input
             type="text"
@@ -185,6 +215,14 @@
           </select>
           <br /><br />
 
+          <label for="dialogInfomessage">お知らせ内容</label>
+          <input
+            type="text"
+            id="dialogInfomessage"
+            name="dialogInfomessage"
+            required
+          /><br /><br />
+
           <label for="dialogRegistrationDate">掲載日:</label>
           <input
             type="date"
@@ -192,6 +230,7 @@
             name="dialogRegistrationDate"
             required
           />
+          <br /><br />
 
           <label for="dialogStartDate">適用期間:</label>
           <input
@@ -204,22 +243,215 @@
           <input type="date" id="dialogEndDate" name="dialogEndDate" required />
           <br /><br />
           <button type="submit">登録</button>
-          <button type="button" id="closeDialogButton">閉じる</button>
+          <button type="button" id="closeDialogButton_reg">閉じる</button>
         </form>
       </div>
     </div>
+
+    <button type="button" id="openDialogButton_upd">データ変更</button>
+    <!-- ダイアログ -->
+    <div id="overlay_upd">
+      <div id="updateDialog">
+        <h3>データ登録フォーム</h3>
+        <form th:action="@{/oshirase/update}" method="post">
+          <input type="hidden" name="searchTitle" th:value="${title}" />
+          <!-- <input type="hidden" name="dialogTitle" th:value="${title}" /> -->
+          <input type="hidden" name="searchCategory" th:value="${category}" />
+          <input
+            type="hidden"
+            name="searchRegistrationDate"
+            th:value="${registrationDate}"
+          />
+          <input type="hidden" name="searchStartDate" th:value="${startDate}" />
+          <input type="hidden" name="searchEndDate" th:value="${endDate}" />
+
+          <label for="id_upd">ID</label>
+          <input type="text" id="id_upd" name="id_upd" readonly />
+          <br /><br />
+
+          <!-- <input type="hidden" id="Id_upd" name="Id_upd" /> -->
+          <label for="dialogTitle_upd">タイトル</label>
+          <input
+            type="text"
+            id="dialogTitle_upd"
+            name="dialogTitle_upd"
+            required
+          />
+          <br /><br />
+
+          <label for="dialogCategory_upd">タイトル区分:</label>
+          <select id="dialogCategory_upd" name="dialogCategory_upd" required>
+            <option value="">--Select an category--</option>
+            <!-- 默认空选项 -->
+            <option
+              th:each="dialogKubunItem : ${allCategory}"
+              th:value="${dialogKubunItem.kubun}"
+              th:text="${dialogKubunItem.displayName}"
+            ></option>
+          </select>
+          <br /><br />
+
+          <label for="dialogRegistrationDate_upd">掲載日:</label>
+          <input
+            type="date"
+            id="dialogRegistrationDate_upd"
+            name="dialogRegistrationDate_upd"
+            required
+          />
+
+          <label for="dialogStartDate_upd">適用期間:</label>
+          <input
+            type="date"
+            id="dialogStartDate_upd"
+            name="dialogStartDate_upd"
+            required
+          />
+          <label for="dialogEndDate_upd">~</label>
+          <input
+            type="date"
+            id="dialogEndDate_upd"
+            name="dialogEndDate_upd"
+            required
+          />
+          <br /><br />
+          <button type="submit">変更</button>
+          <button type="button" id="closeDialogButton_upd">閉じる</button>
+        </form>
+      </div>
+    </div>
+
+    <form th:action="@{/oshirase/delete}" method="post">
+      <input type="hidden" id="id_del" name="id_del" readonly />
+      <!-- <input type="hidden" id=" deleteFlg" name="deleteFlg"/> -->
+      <button type="submit" id="deleteFlg_btn">データ削除</button>
+    </form>
+
     <script>
+      function handleRowClick(row, event) {
+        if (event.target.type === "radio") {
+          return;
+        }
+        // 获取当前行中的 radio 元素
+        var radio = row.querySelector('input[type="radio"]');
+
+        var userid = radio.value;
+
+        // 设置该 radio 为选中状态
+        radio.checked = true;
+      }
+
       // ダイアログの表示と非表示を制御するスクリプト
       document
-        .getElementById("openDialogButton")
+        .getElementById("openDialogButton_reg")
         .addEventListener("click", function () {
           document.getElementById("overlay").style.display = "flex";
         });
 
       document
-        .getElementById("closeDialogButton")
+        .getElementById("closeDialogButton_reg")
         .addEventListener("click", function () {
+          document.getElementById("dialogTitle").value = "";
+          document.getElementById("dialogCategory").value = "";
+          document.getElementById("dialogInfomessage").value = "";
+          document.getElementById("dialogRegistrationDate").value = "";
+          document.getElementById("dialogStartDate").value = "";
+          document.getElementById("dialogStartDate").value = "";
           document.getElementById("overlay").style.display = "none";
+        });
+
+      document
+        .getElementById("openDialogButton_upd")
+        .addEventListener("click", function () {
+          var selectedRadio = document.querySelector(
+            'input[name="selectedRecord"]:checked'
+          );
+
+          if (selectedRadio) {
+            var selectedRow = selectedRadio.closest("tr");
+
+            // 获取该行的各个字段数据
+            // var title = selectedRow.querySelector("td:nth-child(2)").innerText;
+            // var categoryDisplayName =
+            //   selectedRow.querySelector("td:nth-child(3)").innerText;
+            // var regDate =
+            //   selectedRow.querySelector("td:nth-child(4)").innerText;
+            // var period = selectedRow
+            //   .querySelector("td:nth-child(5)")
+            //   .innerText.split(" ~ ");
+            // var startDate = period[0];
+            // var endDate = period[1];
+            var id = selectedRow.getAttribute("data-id");
+            var title = selectedRow.getAttribute("data-title");
+            var category = selectedRow.getAttribute("data-category");
+            var regDate = selectedRow.getAttribute("data-regdate");
+            var startDate = selectedRow.getAttribute("data-startdate");
+            var endDate = selectedRow.getAttribute("data-enddate");
+
+            function formatDate(dateString) {
+              var dateParts = dateString.split("/"); // 将日期按 / 分割为数组
+              var year = dateParts[0];
+              var month = dateParts[1] - 1; // JavaScript 中的月份是从 0 开始的
+              var day = dateParts[2];
+
+              var date = new Date(Date.UTC(year, month, day));
+
+              // 格式化为 yyyy-MM-dd
+              var formattedDate = date.toISOString().slice(0, 10);
+
+              return formattedDate;
+            }
+
+            // 将数据填充到对话框中
+            document.getElementById("dialogTitle_upd").value = title;
+            var select = document.getElementById("dialogCategory_upd");
+            for (var i = 0; i < select.options.length; i++) {
+              if (select.options[i].text === category) {
+                select.selectedIndex = i;
+                break;
+              }
+            }
+            document.getElementById("dialogRegistrationDate_upd").value =
+              formatDate(regDate);
+            document.getElementById("dialogStartDate_upd").value =
+              formatDate(startDate);
+            document.getElementById("dialogEndDate_upd").value =
+              formatDate(endDate);
+
+            // var radio = row.querySelector('input[type="radio"]');
+            document.getElementById("id_upd").value = id;
+
+            // 显示对话框
+            document.getElementById("overlay_upd").style.display = "flex";
+          } else {
+            // 如果没有选中任何行，弹出提示
+            alert("データを選択してください。");
+          }
+        });
+
+      document
+        .getElementById("closeDialogButton_upd")
+        .addEventListener("click", function () {
+          document.getElementById("overlay_upd").style.display = "none";
+        });
+
+      document
+        .getElementById("deleteFlg_btn")
+        .addEventListener("click", function () {
+          var selectedRadio = document.querySelector(
+            'input[name="selectedRecord"]:checked'
+          );
+
+          if (selectedRadio) {
+            var selectedRow = selectedRadio.closest("tr");
+            var id = selectedRow.getAttribute("data-id");
+            // var deleteflg = selectedRow.getAttribute("data-deleteflg");
+
+            document.getElementById("id_del").value = id;
+            // document.getElementById("id_del").value = id;
+          } else {
+            // 如果没有选中任何行，弹出提示
+            alert("データを選択してください。");
+          }
         });
     </script>
   </body>

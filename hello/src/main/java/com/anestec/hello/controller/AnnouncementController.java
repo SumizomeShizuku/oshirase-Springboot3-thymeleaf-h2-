@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.anestec.hello.model.Announcement;
 import com.anestec.hello.model.Category;
@@ -106,14 +107,20 @@ public class AnnouncementController {
         return "oshiraselist"; // Thymeleaf 模板名称
     }
 
-    @PostMapping("/oshirase")
+    @PostMapping("/oshirase/register")
     public String registerAnnouncement(
             @RequestParam("dialogTitle") String title,
             @RequestParam("dialogCategory") String dialogCategory,
+            @RequestParam("dialogInfomessage") String infomessage,
             @RequestParam("dialogRegistrationDate") String dialogRegistrationDate,
             @RequestParam("dialogStartDate") String dialogStartDate,
             @RequestParam("dialogEndDate") String dialogEndDate,
-            Model model) {
+            @RequestParam(value = "searchTitle", required = false) String searchTitle,
+            @RequestParam(value = "searchCategory", required = false) String searchCategory,
+            @RequestParam(value = "searchRegistrationDate", required = false) String searchRegistrationDate,
+            @RequestParam(value = "searchStartDate", required = false) String searchStartDate,
+            @RequestParam(value = "searchEndDate", required = false) String searchEndDate,
+            RedirectAttributes redirectAttributes) {
 
         DateTimeFormatter inputDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         DateTimeFormatter outputDateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -123,7 +130,7 @@ public class AnnouncementController {
         String eDate = LocalDate.parse(dialogEndDate, inputDateFormatter).format(outputDateFormatter);
 
         //test data
-        String infomessage = "Test Info";
+        // infomessage = "Test Info";
         String deleteFlg = "0";
         String createUser = "admin";
         String updateUser = "admin2";
@@ -137,7 +144,79 @@ public class AnnouncementController {
         System.out.println("StartDate: " + "  " + sDate);
         System.out.println("EndDate: " + "  " + eDate);
         // 重定向或返回一个成功页面
+
+        // 将原来的检索条件传递到重定向 URL 中
+        redirectAttributes.addAttribute("title", searchTitle);
+        redirectAttributes.addAttribute("category", searchCategory);
+        redirectAttributes.addAttribute("registrationDate", searchRegistrationDate);
+        redirectAttributes.addAttribute("startDate", searchStartDate);
+        redirectAttributes.addAttribute("endDate", searchEndDate);
         return "redirect:/oshirase";  // 重新加载列表页
+    }
+
+    @PostMapping("/oshirase/update")
+    public String updateAnnouncement(
+            @RequestParam("id_upd") Long id,
+            @RequestParam("dialogTitle_upd") String title,
+            @RequestParam("dialogCategory_upd") String category_upd,
+            @RequestParam("dialogRegistrationDate_upd") String registrationDate_upd,
+            @RequestParam("dialogStartDate_upd") String startDate_upd,
+            @RequestParam("dialogEndDate_upd") String endDate_upd,
+            @RequestParam(value = "searchTitle", required = false) String searchTitle,
+            @RequestParam(value = "searchCategory", required = false) String searchCategory,
+            @RequestParam(value = "searchRegistrationDate", required = false) String searchRegistrationDate,
+            @RequestParam(value = "searchStartDate", required = false) String searchStartDate,
+            @RequestParam(value = "searchEndDate", required = false) String searchEndDate,
+            RedirectAttributes redirectAttributes) {
+
+        System.out.println("Title: " + "  " + title);
+        System.out.println("Category: " + "  " + category_upd);
+        System.out.println("RegistrationDate: " + "  " + registrationDate_upd);
+        System.out.println("StartDate: " + "  " + startDate_upd);
+        System.out.println("EndDate: " + "  " + endDate_upd);
+
+        DateTimeFormatter inputDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter outputDateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+        String regDate = LocalDate.parse(registrationDate_upd, inputDateFormatter).format(outputDateFormatter);
+        String sDate = LocalDate.parse(startDate_upd, inputDateFormatter).format(outputDateFormatter);
+        String eDate = LocalDate.parse(endDate_upd, inputDateFormatter).format(outputDateFormatter);
+
+        announcementService.updateAnnouncement(id, title, category_upd, regDate, sDate, eDate);
+
+        System.out.println("Title: " + "  " + title);
+        System.out.println("Category: " + "  " + category_upd);
+        System.out.println("RegistrationDate: " + "  " + regDate);
+        System.out.println("StartDate: " + "  " + sDate);
+        System.out.println("EndDate: " + "  " + eDate);
+
+        // 重定向回列表页面
+        redirectAttributes.addAttribute("title", searchTitle);
+        redirectAttributes.addAttribute("category", searchCategory);
+        redirectAttributes.addAttribute("registrationDate", searchRegistrationDate);
+        redirectAttributes.addAttribute("startDate", searchStartDate);
+        redirectAttributes.addAttribute("endDate", searchEndDate);
+        return "redirect:/oshirase";
+    }
+
+    @PostMapping("/oshirase/delete")
+    public String deleteAnnouncement(
+            @RequestParam("id_del") Long id_del,
+            @RequestParam(value = "searchTitle", required = false) String searchTitle,
+            @RequestParam(value = "searchCategory", required = false) String searchCategory,
+            @RequestParam(value = "searchRegistrationDate", required = false) String searchRegistrationDate,
+            @RequestParam(value = "searchStartDate", required = false) String searchStartDate,
+            @RequestParam(value = "searchEndDate", required = false) String searchEndDate,
+            RedirectAttributes redirectAttributes) {
+        announcementService.deleteAnnouncement(id_del);
+
+        // 重定向回列表页面
+        redirectAttributes.addAttribute("title", searchTitle);
+        redirectAttributes.addAttribute("category", searchCategory);
+        redirectAttributes.addAttribute("registrationDate", searchRegistrationDate);
+        redirectAttributes.addAttribute("startDate", searchStartDate);
+        redirectAttributes.addAttribute("endDate", searchEndDate);
+        return "redirect:/oshirase";
     }
 
     // @GetMapping("/")
