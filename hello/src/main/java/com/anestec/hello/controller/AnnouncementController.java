@@ -130,7 +130,6 @@ public class AnnouncementController {
         String eDate = LocalDate.parse(dialogEndDate, inputDateFormatter).format(outputDateFormatter);
 
         //test data
-        // infomessage = "Test Info";
         String deleteFlg = "0";
         String createUser = "admin";
         String updateUser = "admin2";
